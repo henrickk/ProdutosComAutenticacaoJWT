@@ -16,7 +16,7 @@ namespace ProdutosComAutenticacaoJWT.Controllers
         }
 
         [HttpGet]
-        [Route("BuscarProdutos")]
+        [Route("buscar-produtos")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<Produto>>> BuscarProdutos()
@@ -25,7 +25,7 @@ namespace ProdutosComAutenticacaoJWT.Controllers
         }
 
         [HttpGet]
-        [Route("BuscarProdutoPorId/{id:int}")]
+        [Route("buscar-produtoPorId/{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Produto>> BuscarProdutoPorId(int id)
@@ -36,6 +36,17 @@ namespace ProdutosComAutenticacaoJWT.Controllers
                 return NotFound();
             }
             return produto;
+        }
+
+        [HttpPost]
+        [Route("adicionar-produto")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Produto>> AdicionarProduto(Produto produto)
+        {
+            _context.Produtos.Add(produto);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(BuscarProdutoPorId), new { id = produto.Id }, produto);
         }
     }
 }
