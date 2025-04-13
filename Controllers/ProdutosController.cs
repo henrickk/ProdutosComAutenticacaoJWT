@@ -21,6 +21,11 @@ namespace ProdutosComAutenticacaoJWT.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<Produto>>> BuscarProdutos()
         {
+            if (_context.Produtos == null)
+            {
+                return NotFound();
+            }
+
             return await _context.Produtos.ToListAsync();
         }
 
@@ -30,11 +35,18 @@ namespace ProdutosComAutenticacaoJWT.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Produto>> BuscarProdutoPorId(int id)
         {
+            if (_context.Produtos == null)
+            {
+                return NotFound();
+            }
+
             var produto = await _context.Produtos.FindAsync(id);
+
             if (produto == null)
             {
                 return NotFound();
             }
+
             return produto;
         }
 
@@ -44,8 +56,22 @@ namespace ProdutosComAutenticacaoJWT.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<Produto>> AdicionarProduto(Produto produto)
         {
+            if(_context.Produtos == null)
+            {
+                return Problem("Erro ao adicionar um produto, contate o suporte!");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(new ValidationProblemDetails(ModelState)
+                {
+                    Title = "Um ou mais erros de validação ocorreram."
+                });
+            }
+
             _context.Produtos.Add(produto);
             await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(BuscarProdutoPorId), new { id = produto.Id }, produto);
         }
 
@@ -56,12 +82,39 @@ namespace ProdutosComAutenticacaoJWT.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> AtualizarProduto(int id, Produto produto)
         {
+            if (id != produto.Id)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             _context.Entry(produto).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProdutoExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             await _context.SaveChangesAsync();
             return NoContent();
-                
+
         }
+
 
         [HttpDelete]
         [Route("deletar-produto/{id:int}")]
@@ -69,12 +122,27 @@ namespace ProdutosComAutenticacaoJWT.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeletarProduto(int id)
         {
+            if (_context.Produtos == null)
+            {
+                return NotFound();
+            }
+
             var produto = await _context.Produtos.FindAsync(id);
+
+            if (produto == null)
+            {
+                return NotFound();
+            }
 
             _context.Produtos.Remove(produto);
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        private bool ProdutoExists(int id)
+        {
+            return (_context.Produtos?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
     }
