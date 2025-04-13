@@ -48,5 +48,34 @@ namespace ProdutosComAutenticacaoJWT.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(BuscarProdutoPorId), new { id = produto.Id }, produto);
         }
+
+        [HttpPut]
+        [Route("atualizar-produto/{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AtualizarProduto(int id, Produto produto)
+        {
+            _context.Entry(produto).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+            return NoContent();
+                
+        }
+
+        [HttpDelete]
+        [Route("deletar-produto/{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeletarProduto(int id)
+        {
+            var produto = await _context.Produtos.FindAsync(id);
+
+            _context.Produtos.Remove(produto);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
     }
 }
