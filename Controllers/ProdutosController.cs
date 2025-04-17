@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProdutosComAutenticacaoJWT.Data;
 using ProdutosComAutenticacaoJWT.Models;
 
 namespace ProdutosComAutenticacaoJWT.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/produtos")]
     public class ProdutosController : ControllerBase
@@ -15,6 +17,7 @@ namespace ProdutosComAutenticacaoJWT.Controllers
             _context = context;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [Route("buscar-produtos")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -115,7 +118,7 @@ namespace ProdutosComAutenticacaoJWT.Controllers
 
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         [Route("deletar-produto/{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
