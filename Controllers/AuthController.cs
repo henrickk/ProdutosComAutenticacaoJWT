@@ -87,19 +87,6 @@ namespace ProdutosComAutenticacaoJWT.Controllers
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.Segredo);
 
-            //var tokenDescriptor = new SecurityTokenDescriptor
-            //{
-            //    Subject = new ClaimsIdentity(claims),
-            //    Issuer = _jwtSettings.Emissor,
-            //    Audience = _jwtSettings.Audiencia,
-            //    NotBefore = agora,
-            //    IssuedAt = agora,
-            //    Expires = agora.AddHours(_jwtSettings.TempoExpiracao),
-            //    SigningCredentials = new SigningCredentials(
-            //        new SymmetricSecurityKey(key),
-            //        SecurityAlgorithms.HmacSha256Signature
-            //    )
-            //};
 
             var tokenDescriptor = tokenHandler.CreateToken(new SecurityTokenDescriptor
             {
@@ -110,7 +97,6 @@ namespace ProdutosComAutenticacaoJWT.Controllers
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             });
 
-            //var token = tokenHandler.CreateToken(tokenDescriptor);
             var encodedToken = tokenHandler.WriteToken(tokenDescriptor);
 
             return encodedToken;
