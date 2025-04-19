@@ -118,7 +118,7 @@ namespace ProdutosComAutenticacaoJWT.Controllers
 
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpDelete]
         [Route("deletar-produto/{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
